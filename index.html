@@ -1,0 +1,50 @@
+<!doctype html>
+<!-- Copyright (c) 2016 Felix Bolte -->
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Felix Bolte">
+    <meta name="date" content="2016-03-09T00:00:00+01:00">
+    <title>qual-o-mat-kiss</title>
+    <link rel="icon" href="fav.ico" type="image/vnd.microsoft.icon">
+    <link rel="shortcut icon" href="fav.ico" type="image/vnd.microsoft.icon">
+    <link rel="stylesheet" type="text/css" href="css/default.css">
+    <script type="text/javascript" src="js/common.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>qual-o-mat-kiss</h1>
+    </header>
+    
+    <!-- available elections as dropdown menu -->
+    <nav>
+      <select id="select_election" size="1" disabled>
+      </select>
+      <button id="button_load_election" disabled>Los</button>
+    </nav>
+    
+    <!-- description about election -->
+    <section id="header_election">
+      <noscript>
+        <h4 style="color:red;">ERROR: This page needs JavaScript. Please enable and reload.</h4>
+      </noscript>
+    </section>
+    
+    <!-- statements and answers as radio buttons -->
+    <main id="content_election" style="float:left; width:700px;">
+    </main>
+    
+    <!-- parties and user result -->
+    <aside id="result_election" style="float:right; width:calc(100% - 720px); text-align:left;">
+    </aside>
+    
+    <!-- footer / show license -->
+    <footer id="footer_election" style="clear:both;">
+      <br>
+      <hr>
+      <pre><b>Copyright (c) 2016 Felix Bolte / MIT License (<a target="_blank" href="https://github.com/gockelhahn/qual-o-mat-kiss">https://github.com/gockelhahn/qual-o-mat-kiss</a>)</b></pre>
+      <pre style="color:grey;"><b>Using data from <a target="_blank" href="https://github.com/gockelhahn/qual-o-mat-data">https://github.com/gockelhahn/qual-o-mat-data</a>)</b></pre>
+    </footer>
+  </body>
+</html>

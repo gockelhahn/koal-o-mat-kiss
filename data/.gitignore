@@ -1,0 +1,6 @@
+# do not upload content here
+# this folder should gather the data from external sources
+# later this could be handled by git submodule
+*
+# gitignore should still be seen though
+!.gitignore

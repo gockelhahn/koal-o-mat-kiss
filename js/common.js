@@ -234,7 +234,7 @@ function show_content() {
             var radio_id_skip = radio_group_name + 'skip';
             var radio_id_skip_label = 'Überspringen';
             // show statement
-            content += '<fieldset style="font-size:smaller;"><legend><b>' + (i + 1) + '.</b> <i>' + escapeHtml(statement[i].text) + '</i></legend>';
+            content += '<fieldset style="font-size:smaller;"><legend><strong>' + (i + 1) + '.</strong> <em>' + escapeHtml(statement[i].text) + '</em></legend>';
             // create skip radio button
             content += '<input type="radio" name="' + radio_group_name + '" id="' + radio_id_skip + '" value="skip" checked><label style="font-size:smaller;" for="' + radio_id_skip + '">' + radio_id_skip_label + '</label>';
             for (var j = 0; j < answer.length; j++) {
@@ -279,7 +279,7 @@ function show_result() {
         // create numbered list and add all parties
         result += '<ol type="1">';
         for (var i = 0; i < party.length; i++) {
-            result += '<li style="font-size:smaller;"><b>' + escapeHtml(party[i].name) + '</b>: ' + party[i].result + ' von ' + valid_statements + ' Punkten</li>';
+            result += '<li style="font-size:smaller;"><strong>' + escapeHtml(party[i].name) + '</strong>: ' + party[i].result + ' von ' + valid_statements + ' Punkten</li>';
         };
         result += '</ol>';
         document.getElementById('result_election').style.border = 'solid green';

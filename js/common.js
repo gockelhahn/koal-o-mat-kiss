@@ -106,7 +106,9 @@ function read_json_from_file(json_file, callback) {
         if (request.readyState === 4) {
             var response_json = null;
             // if http is OK or NOT MODIFIED
-            if (request.status === 200 || request.status === 304) {
+            // or code is 0 in case it was opened as local file
+            // (see https://www.w3.org/TR/XMLHttpRequest/#the-status-attribute)
+            if (request.status === 0 || request.status === 200 || request.status === 304) {
                 // uncomment the following line to see successful requests
                 //console.log('SUCCES: ' + json_file);
                 // try to parse response as json

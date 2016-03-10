@@ -126,8 +126,8 @@ function read_json_from_file(json_file, callback) {
             callback(response_json);
         };
     };
-    // set request timeout to 3 seconds
-    request.timeout = 3000;
+    // set request timeout to 6 seconds
+    request.timeout = 6000;
     request.ontimeout = function () {
         // if request did not finish after set timeout
         console.log('Failed to to load json (' + json_file + ') due to a timeout of ' + request.timeout + 'ms');

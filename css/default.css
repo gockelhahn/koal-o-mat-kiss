@@ -1,3 +1,42 @@
 /* Copyright (c) 2016 Felix Bolte */
 
-input[type="radio"]:checked+label{ font-weight:bold; } 
+/* general */
+body {
+  width: 640px;
+  text-align: left;
+}
+
+/* show error message in red */
+#error {
+  color: red;
+}
+
+/* make all checked radio button labels bold */
+input[type="radio"]:checked+label {
+  font-weight: bold;
+}
+
+/* show result in green border */
+#result_election {
+  margin-top: 16px;
+  border: solid green;
+  font-size: smaller;
+}
+
+#content_election {
+  font-size: smaller;
+}
+
+/* remove border if element is empty */
+#result_election:empty {
+  border: none;
+}
+
+#code {
+  font-weight: bold;
+}
+
+#data {
+  font-weight: bold;
+  color: gray;
+}

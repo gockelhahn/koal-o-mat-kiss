@@ -58,19 +58,16 @@ function reset_opinion() {
 
 // reset header and its states
 function reset_header() {
-    document.getElementById('header_election').style.display = 'none';
     document.getElementById('header_election').innerHTML = '';
 }
 
 // reset content and its states
 function reset_content() {
-    document.getElementById('content_election').style.display = 'none';
     document.getElementById('content_election').innerHTML = '';
 }
 
 // reset result and its states
 function reset_result() {
-    document.getElementById('result_election').style.display = 'none';
     document.getElementById('result_election').innerHTML = '';
 }
 
@@ -153,7 +150,7 @@ function calculate_result() {
         var radio_group_name = 'radio_statement' + i;
         var selector = 'input[name="' + radio_group_name + '"]:checked';
         var checked_button = document.querySelector(selector);
-        // if skip button checked, ignore statement
+        // if the skip button is checked, ignore this statement
         if ((checked_button.id).indexOf('skip') > -1) {
             continue;
         };
@@ -180,9 +177,9 @@ function show_list(elections) {
     var error = '';
     // list not loaded correctly, so show error
     if (elections === null) {
-        error = '<h4 style="color:red;">ERROR: Failed to load ' + json_list + '. Please have a look into the javascript console. You have to refresh the page to try again!</h4>';
+        error = '<h4 id="error">ERROR: Failed to load ' + json_list + '. Please have a look into the javascript console. You have to refresh the page to try again!</h4>';
     } else if (elections.length <= 0) {
-        error = '<h4 style="color:red;">ERROR: ' + json_list + ' does not contain any election. Please check the configured &quot;data_url&quot; variable and assure that it contains all needed files.</h4>';
+        error = '<h4 id="error">ERROR: ' + json_list + ' does not contain any election. Please check the configured &quot;data_url&quot; variable and assure that it contains all needed files.</h4>';
     } else {
         // get dropdown menu
         var select_election = document.getElementById('select_election');
@@ -200,7 +197,6 @@ function show_list(elections) {
     // finally show header with error message if something gone wrong
     if (elections === null || elections.length > 0) {
         document.getElementById('header_election').innerHTML = error;
-        document.getElementById('header_election').style.display = 'block';
     };
 }
 
@@ -209,13 +205,12 @@ function show_header() {
     var header = '';
     // overview not loaded correctly, so show error
     if (overview === null) {
-        header = '<h4 style="color:red;">ERROR: Failed to load ' + json_overview + '. Please have a look into the javascript console.</h4>';
+        header = '<h4 id="error">ERROR: Failed to load ' + json_overview + '. Please have a look into the javascript console.</h4>';
     } else {
-        header = '<h4>' + escapeHtml(overview.title) + ' (<a target="_blank" href="' + escapeHtml(overview.info) + '">info</a>) am ' + escapeHtml(overview.date.slice(0,10)) + ' (<a target="_blank" href="' + escapeHtml(overview.data_source) + '">quelle</a>)</h4>';
+        header = '<h3 id="title">' + escapeHtml(overview.title) + ' (<a target="_blank" href="' + escapeHtml(overview.info) + '">info</a>) am ' + escapeHtml(overview.date.slice(0,10)) + ' (<a target="_blank" href="' + escapeHtml(overview.data_source) + '">quelle</a>)</h3>';
     };
     
     document.getElementById('header_election').innerHTML = header;
-    document.getElementById('header_election').style.display = 'block';
     // enable election loading button only when answer and statement finished loading as well
     if (answer_loaded
             && statement_loaded) {
@@ -229,20 +224,20 @@ function show_content() {
     // not all files loaded correctly, so show error
     if (statement === null
             || answer === null) {
-        content = '<h4 style="color:red;">ERROR: Failed to load ' + json_statement + ' or ' + json_answer + '. Please have a look into the javascript console.</h4>';
+        content = '<h4 id="error"">ERROR: Failed to load ' + json_statement + ' or ' + json_answer + '. Please have a look into the javascript console.</h4>';
     } else {
         for (var i = 0; i < statement.length; i++) {
             var radio_group_name = 'radio_statement' + i;
             var radio_id_skip = radio_group_name + 'skip';
             var radio_id_skip_label = 'Überspringen';
             // show statement
-            content += '<fieldset style="font-size:smaller;"><legend><strong>' + (i + 1) + '.</strong> <em>' + escapeHtml(statement[i].text) + '</em></legend>';
+            content += '<fieldset><legend><strong>' + (i + 1) + '.</strong> <em>' + escapeHtml(statement[i].text) + '</em></legend>';
             // create skip radio button
-            content += '<input type="radio" name="' + radio_group_name + '" id="' + radio_id_skip + '" value="skip" checked><label style="font-size:smaller;" for="' + radio_id_skip + '">' + radio_id_skip_label + '</label>';
+            content += '<input type="radio" name="' + radio_group_name + '" id="' + radio_id_skip + '" value="skip" checked><label for="' + radio_id_skip + '">' + radio_id_skip_label + '</label>';
             for (var j = 0; j < answer.length; j++) {
                 var radio_id = radio_group_name + 'answer' + escapeHtml(answer[j].id);
                 // create radio button for each given answer
-                content += '<input type="radio" name="' + radio_group_name + '" id="' + radio_id + '" value="' + escapeHtml(answer[j].id) + '"><label style="font-size:smaller;" for="' + radio_id + '">' + escapeHtml(answer[j].message) + '</label>';
+                content += '<input type="radio" name="' + radio_group_name + '" id="' + radio_id + '" value="' + escapeHtml(answer[j].id) + '"><label for="' + radio_id + '">' + escapeHtml(answer[j].message) + '</label>';
             };
             content += '</fieldset>';
         };
@@ -250,7 +245,6 @@ function show_content() {
     };
     
     document.getElementById('content_election').innerHTML = content;
-    document.getElementById('content_election').style.display = 'block';
     // listener can only be added after setting innerHTML
     // so check again if an error occured on json load 
     if (statement !== null
@@ -269,8 +263,7 @@ function show_result() {
     // not all files loaded correctly, so show error
     if (party === null
             || opinion === null) {
-        result = '<h4 style="color:red;">ERROR: Failed to load ' + json_party + ' or ' + json_opinion + '. Please have a look into the javascript console.</h4>';
-        document.getElementById('result_election').style.border = 'none';
+        result = '<h4 id="error">ERROR: Failed to load ' + json_party + ' or ' + json_opinion + '. Please have a look into the javascript console.</h4>';
     } else {
         calculate_result();
         // sort parties by their result (top down)
@@ -281,14 +274,12 @@ function show_result() {
         // create numbered list and add all parties
         result += '<ol type="1">';
         for (var i = 0; i < party.length; i++) {
-            result += '<li style="font-size:smaller;"><strong>' + escapeHtml(party[i].name) + '</strong>: ' + party[i].result + ' von ' + valid_statements + ' Punkten</li>';
+            result += '<li><strong>' + escapeHtml(party[i].name) + '</strong>: ' + party[i].result + ' von ' + valid_statements + ' Punkten</li>';
         };
         result += '</ol>';
-        document.getElementById('result_election').style.border = 'solid green';
     };
     
     document.getElementById('result_election').innerHTML = result;
-    document.getElementById('result_election').style.display = 'block';
     // go to the top where the result is displayed
     window.scrollTo(0, 0);
     // show button again, for reloading result (after changing opinions)

@@ -1,49 +1,47 @@
 <!doctype html>
-<!-- Copyright (c) 2016 Felix Bolte -->
 <html lang="de">
+<!-- Copyright (c) 2016 Felix Bolte -->
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Felix Bolte">
-    <meta name="date" content="2016-03-10T00:00:00+01:00">
-    <title>qual-o-mat-kiss</title>
+    <meta name="date" content="2016-03-12T00:00:00+01:00">
+    <title>Qual-O-Mat</title>
     <link rel="icon" href="./favicon.ico">
     <link rel="stylesheet" href="css/default.css">
     <script src="js/common.js"></script>
   </head>
   <body>
-    <header>
-      <h1>qual-o-mat-kiss</h1>
+    <header id="top_heading">
+      <h1>Qual-O-Mat</h1>
     </header>
     
     <!-- available elections as dropdown menu -->
-    <nav>
-      <select id="select_election" size="1" disabled>
-      </select>
+    <nav id="nav_election">
+      <span>Auswahl:</span>
+      <select id="select_election" size="1" disabled></select>
       <button id="button_load_election" disabled>Los</button>
     </nav>
+    
+    <!-- parties and user result -->
+    <aside id="result_election"></aside>
     
     <!-- description about election -->
     <section id="header_election">
       <noscript>
-        <h4 style="color:red;">ERROR: This page needs JavaScript. Please enable and reload.</h4>
+        <h4 id="error">ERROR: This page needs JavaScript. Please enable and reload.</h4>
       </noscript>
     </section>
     
     <!-- statements and answers as radio buttons -->
-    <main id="content_election" style="float:left; width:700px;">
-    </main>
-    
-    <!-- parties and user result -->
-    <aside id="result_election" style="float:right; width:calc(100% - 720px); text-align:left;">
-    </aside>
+    <main id="content_election"></main>
     
     <!-- footer / show license -->
-    <footer id="footer_election" style="clear:both;">
+    <footer id="footer_election">
       <br>
       <hr>
-      <pre><strong>Copyright (c) 2016 Felix Bolte / MIT License (<a target="_blank" href="https://github.com/gockelhahn/qual-o-mat-kiss">https://github.com/gockelhahn/qual-o-mat-kiss</a>)</strong></pre>
-      <pre style="color:grey;"><strong>Using data from <a target="_blank" href="https://github.com/gockelhahn/qual-o-mat-data">https://github.com/gockelhahn/qual-o-mat-data</a>)</strong></pre>
+      <pre id="code">Copyright (c) 2016 Felix Bolte / MIT License (<a target="_blank" href="https://github.com/gockelhahn/qual-o-mat-kiss">https://github.com/gockelhahn/qual-o-mat-kiss</a>)</pre>
+      <pre id="data">Using data from <a target="_blank" href="https://github.com/gockelhahn/qual-o-mat-data">https://github.com/gockelhahn/qual-o-mat-data</a>)</pre>
     </footer>
   </body>
 </html>

@@ -56,31 +56,39 @@ function reset_opinion() {
     opinion = null;
 }
 
-// reset header and its states
+// clear error messages
+function reset_error() {
+    document.getElementById('error_election').innerHTML = '';
+}
+
+// clear header
 function reset_header() {
     document.getElementById('header_election').innerHTML = '';
 }
 
-// reset content and its states
+// clear content
 function reset_content() {
     document.getElementById('content_election').innerHTML = '';
 }
 
-// reset result and its states
+// clear result
 function reset_result() {
     document.getElementById('result_election').innerHTML = '';
 }
 
 // reset all
 function reset() {
+    // clear html dom
+    reset_error();
+    reset_header();
+    reset_content();
+    reset_result();
+    // clear states
     reset_overview();
     reset_answer();
     reset_statement();
     reset_party();
     reset_opinion();
-    reset_header();
-    reset_content();
-    reset_result();
 }
 
 // escape html special characters: &,<,>,",'
@@ -172,14 +180,23 @@ function calculate_result() {
     };
 }
 
+// show error message
+function show_error(msg) {
+    if (msg === null) {
+        msg = 'Failed to load or parse needed data. See console for more info. Please try again!';
+    };
+    var final_msg = '<pre>ERROR: ' + msg + '</pre>';
+    document.getElementById('error_election').innerHTML = final_msg;
+}
+
 // fill up the dropdown menu with available elections
 function show_list(elections) {
     var error = '';
     // list not loaded correctly, so show error
     if (elections === null) {
-        error = '<h4 id="error">ERROR: Failed to load ' + json_list + '. Please have a look into the javascript console. You have to refresh the page to try again!</h4>';
-    } else if (elections.length <= 0) {
-        error = '<h4 id="error">ERROR: ' + json_list + ' does not contain any election. Please check the configured &quot;data_url&quot; variable and assure that it contains all needed files.</h4>';
+        show_error(null);
+    } else if (elections.length == 0) {
+        show_error('No available elections found.');
     } else {
         // get dropdown menu
         var select_election = document.getElementById('select_election');
@@ -193,24 +210,18 @@ function show_list(elections) {
         document.getElementById('select_election').disabled = false;
         document.getElementById('button_load_election').disabled = false;
     };
-    
-    // finally show header with error message if something gone wrong
-    if (elections === null || elections.length > 0) {
-        document.getElementById('header_election').innerHTML = error;
-    };
 }
 
 // show brief description about selected election
 function show_header() {
-    var header = '';
     // overview not loaded correctly, so show error
     if (overview === null) {
-        header = '<h4 id="error">ERROR: Failed to load ' + json_overview + '. Please have a look into the javascript console.</h4>';
+        show_error('Failed to load or parse the election overview. See console for more info.');
     } else {
-        header = '<h3 id="title">' + escapeHtml(overview.title) + ' (<a target="_blank" href="' + escapeHtml(overview.info) + '">info</a>) am ' + escapeHtml(overview.date.slice(0,10)) + ' (<a target="_blank" href="' + escapeHtml(overview.data_source) + '">quelle</a>)</h3>';
+        var header = '<h4>' + escapeHtml(overview.title) + ' (<a target="_blank" href="' + escapeHtml(overview.info) + '">info</a>) am ' + escapeHtml(overview.date.slice(0,10)) + ' (<a target="_blank" href="' + escapeHtml(overview.data_source) + '">quelle</a>)</h4>';
+        document.getElementById('header_election').innerHTML = header;
     };
     
-    document.getElementById('header_election').innerHTML = header;
     // enable election loading button only when answer and statement finished loading as well
     if (answer_loaded
             && statement_loaded) {
@@ -220,12 +231,12 @@ function show_header() {
 
 // show main page as statement and possible answers
 function show_content() {
-    var content = '';
     // not all files loaded correctly, so show error
     if (statement === null
             || answer === null) {
-        content = '<h4 id="error"">ERROR: Failed to load ' + json_statement + ' or ' + json_answer + '. Please have a look into the javascript console.</h4>';
+        show_error(null);
     } else {
+        var content = '';
         for (var i = 0; i < statement.length; i++) {
             var radio_group_name = 'radio_statement' + i;
             var radio_id_skip = radio_group_name + 'skip';
@@ -242,15 +253,11 @@ function show_content() {
             content += '</fieldset>';
         };
         content += '<br><button id="button_load_result">Auswertung</button>';
-    };
-    
-    document.getElementById('content_election').innerHTML = content;
-    // listener can only be added after setting innerHTML
-    // so check again if an error occured on json load 
-    if (statement !== null
-            && answer !== null) {
+        document.getElementById('content_election').innerHTML = content;
+        // listener can only be added after setting innerHTML
         document.getElementById('button_load_result').addEventListener('click', load_result);
     };
+    
     // enable election loading button only when overview finished loading as well
     if (overview_loaded) {
         document.getElementById('button_load_election').disabled = false;
@@ -259,11 +266,10 @@ function show_content() {
 
 // show parties and their results corresponding to the user answers
 function show_result() {
-    var result = '';
     // not all files loaded correctly, so show error
     if (party === null
             || opinion === null) {
-        result = '<h4 id="error">ERROR: Failed to load ' + json_party + ' or ' + json_opinion + '. Please have a look into the javascript console.</h4>';
+        show_error(null);
     } else {
         calculate_result();
         // sort parties by their result (top down)
@@ -272,14 +278,14 @@ function show_result() {
         });
         
         // create numbered list and add all parties
-        result += '<ol type="1">';
+        var result = '<ol type="1">';
         for (var i = 0; i < party.length; i++) {
             result += '<li><strong>' + escapeHtml(party[i].name) + '</strong>: ' + party[i].result + ' von ' + valid_statements + ' Punkten</li>';
         };
         result += '</ol>';
+        document.getElementById('result_election').innerHTML = result;
     };
     
-    document.getElementById('result_election').innerHTML = result;
     // go to the top where the result is displayed
     window.scrollTo(0, 0);
     // show button again, for reloading result (after changing opinions)
@@ -330,48 +336,50 @@ function callback_load_opinion(object) {
 
 function load_election() {
     document.getElementById('button_load_election').disabled = true;
+    
     // check if selected option was already loaded before
-    if (document.getElementById('select_election').value === selected) {
-        // do not load json if already loaded
-        if (overview !== null) {
-            show_header();
-        } else {
-            reset_overview();
-            read_json_from_file(data_url + '/' + selected + '/' + json_overview, callback_load_overview);
-        };
-        // do not load json if already loaded
-        if (answer !== null && statement != null) {
-            show_content();
-        } else {
-            reset_content();
-            // if both are null, we have to set their $_loaded to false before calling each's read_json_from_file
-            if (answer === null && statement === null) {
-                answer_loaded = false;
-                statement_loaded = false;
-            };
-            if (answer === null) {
-                reset_answer();
-                read_json_from_file(data_url + '/' + selected + '/' + json_answer, callback_load_answer);
-            };
-            if (statement === null) {
-                reset_statement();
-                read_json_from_file(data_url + '/' + selected + '/' + json_statement, callback_load_statement);
-            };
-        };
-    } else {
+    if (document.getElementById('select_election').value !== selected) {
         // save selected election
         selected = document.getElementById('select_election').value;
         // clear page and reset states
         reset();
-        // load all json
+    };
+    
+    // do not load json if already loaded
+    if (overview !== null) {
+        show_header();
+    } else {
+        reset_error();
+        reset_header();
+        reset_overview();
         read_json_from_file(data_url + '/' + selected + '/' + json_overview, callback_load_overview);
-        read_json_from_file(data_url + '/' + selected + '/' + json_answer, callback_load_answer);
-        read_json_from_file(data_url + '/' + selected + '/' + json_statement, callback_load_statement);
+    };
+    
+    // do not load json if already loaded
+    if (answer !== null && statement != null) {
+        show_content();
+    } else {
+        reset_error();
+        reset_content();
+        // if both are null, we have to set their $_loaded to false before calling each's read_json_from_file
+        if (answer === null && statement === null) {
+            answer_loaded = false;
+            statement_loaded = false;
+        };
+        if (answer === null) {
+            reset_answer();
+            read_json_from_file(data_url + '/' + selected + '/' + json_answer, callback_load_answer);
+        };
+        if (statement === null) {
+            reset_statement();
+            read_json_from_file(data_url + '/' + selected + '/' + json_statement, callback_load_statement);
+        };
     };
 }
 
 function load_result() {
     document.getElementById('button_load_result').disabled = true;
+    
     // do not load json if already loaded
     if (party !== null && opinion !== null) {
         show_result();

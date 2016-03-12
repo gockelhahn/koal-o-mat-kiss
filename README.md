@@ -16,7 +16,7 @@ In der Datei *[js/common.js](js/common.js)* wird mit der Variable **data_url** d
 ```javascript
 var data_url = 'https://raw.githubusercontent.com/gockelhahn/qual-o-mat-data/master';
 ```
-Für selbst gehostete Daten, kann man auch einen relativen Pfad setzen.
+Für selbst gehostete Daten kann man auch einen relativen Pfad setzen.
 
 ## Offline Modus
 

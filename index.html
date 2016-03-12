@@ -12,32 +12,37 @@
     <script src="js/common.js"></script>
   </head>
   <body>
-    <header id="top_heading">
+    <header id="heading_site">
       <h1>Qual-O-Mat</h1>
     </header>
     
-    <!-- available elections as dropdown menu -->
-    <nav id="nav_election">
-      <span>Auswahl:</span>
-      <select id="select_election" size="1" disabled></select>
-      <button id="button_load_election" disabled>Los</button>
-    </nav>
-    
-    <!-- parties and user result -->
-    <aside id="result_election"></aside>
-    
-    <!-- description about election -->
-    <section id="header_election">
-      <noscript>
-        <h4 id="error">ERROR: This page needs JavaScript. Please enable and reload.</h4>
-      </noscript>
-    </section>
-    
-    <!-- statements and answers as radio buttons -->
-    <main id="content_election"></main>
+    <main>
+      <!-- available elections as dropdown menu -->
+      <nav id="nav_election">
+        <span>Auswahl:</span>
+        <select id="select_election" size="1" disabled></select>
+        <button id="button_load_election" disabled>Los</button>
+      </nav>
+      
+      <!-- error messages -->
+      <aside id="error_election">
+        <noscript>
+          <pre>ERROR: This page needs JavaScript. Please enable and reload.</pre>
+        </noscript>
+      </aside>
+      
+      <!-- parties and user result -->
+      <aside id="result_election"></aside>
+      
+      <!-- description about election -->
+      <header id="header_election"></header>
+      
+      <!-- statements and answers as radio buttons -->
+      <aside id="content_election"></aside>
+    </main>
     
     <!-- footer / show license -->
-    <footer id="footer_election">
+    <footer id="footer_site">
       <br>
       <hr>
       <pre id="code">Copyright (c) 2016 Felix Bolte / MIT License (<a target="_blank" href="https://github.com/gockelhahn/qual-o-mat-kiss">https://github.com/gockelhahn/qual-o-mat-kiss</a>)</pre>

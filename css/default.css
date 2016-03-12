@@ -6,30 +6,32 @@ body {
   text-align: left;
 }
 
-/* show error message in red */
-#error {
-  color: red;
-}
-
 /* make all checked radio button labels bold */
 input[type="radio"]:checked+label {
+  font-weight: bold;
+}
+
+/* show error message in red */
+#error_election {
+  color: red;
   font-weight: bold;
 }
 
 /* show result in green border */
 #result_election {
   margin-top: 16px;
+  margin-bottom: 16px;
   border: solid green;
-  font-size: small;
-}
-
-#content_election {
   font-size: small;
 }
 
 /* remove border if element is empty */
 #result_election:empty {
   border: none;
+}
+
+#content_election {
+  font-size: small;
 }
 
 #code {

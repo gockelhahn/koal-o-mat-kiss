@@ -2,7 +2,7 @@
 
 /* general */
 body {
-  width: 640px;
+  width: 720px;
   text-align: left;
 }
 
@@ -20,11 +20,11 @@ input[type="radio"]:checked+label {
 #result_election {
   margin-top: 16px;
   border: solid green;
-  font-size: smaller;
+  font-size: small;
 }
 
 #content_election {
-  font-size: smaller;
+  font-size: small;
 }
 
 /* remove border if element is empty */

@@ -4,7 +4,7 @@ Dieses Repository enthält einen simplen POC (Proof of concept) eines "Wahl-*too
 
 ## Preview
 
-Man kann sich [hier](https://cdn.rawgit.com/gockelhahn/qual-o-mat-kiss/master/index.html) immer die aktuelle Version anzeigen lassen.
+Man kann sich [hier](https://rawgit.com/gockelhahn/qual-o-mat-kiss/master/index.html) immer die aktuelle Version anzeigen lassen.
 
 ## Setup
 
@@ -12,7 +12,7 @@ Da es sich bei dieser Seite um reines HTML(5) und clientseitiges JavaScript hand
 
 ## Konfiguration
 
-In der Datei *[js/common.js](blob/master/js/common.js)* wird mit der Variable **data_url** die Herkunft der zu benutzenden Daten definiert.
+In der Datei *[js/common.js](js/common.js)* wird mit der Variable **data_url** die Herkunft der zu benutzenden Daten definiert.
 ```javascript
 var data_url = 'https://raw.githubusercontent.com/gockelhahn/qual-o-mat-data/master';
 ```
@@ -34,4 +34,4 @@ Da Chromium/Chrome XMLHttpRequest (XHR) auf "file:///" defaultmäßig verbietet,
 
 ## Lizenz
 
-Für alle Dateien in diesem Repository gilt folgende [Lizenz](blob/master/LICENSE).
+Für alle Dateien in diesem Repository gilt folgende [Lizenz](LICENSE).

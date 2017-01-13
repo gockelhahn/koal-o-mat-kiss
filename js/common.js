@@ -7,41 +7,24 @@ var data_url = 'https://raw.githubusercontent.com/gockelhahn/qual-o-mat-data/mas
 //var data_url = 'data';
 var json_list = 'list.json';
 var json_overview = 'overview.json';
-var json_answer = 'answer.json';
 var json_party = 'party.json';
-var json_statement = 'statement.json';
 var json_opinion = 'opinion.json';
 
 // save the states of the selection
-var valid_statements = 0;
 var selected = '';
 var overview_loaded;
 var overview;
-var answer_loaded;
-var answer;
 var party_loaded;
 var party;
-var statement_loaded;
-var statement;
 var opinion_loaded;
 var opinion;
+var coalition = null;
+var statements = 0;
 
 // reset overview vars
 function reset_overview() {
     overview_loaded = false;
     overview = null;
-}
-
-// reset answer vars
-function reset_answer() {
-    answer_loaded = false;
-    answer = null;
-}
-
-// reset statement vars
-function reset_statement() {
-    statement_loaded = false;
-    statement = null;
 }
 
 // reset party vars
@@ -66,11 +49,6 @@ function reset_header() {
     document.getElementById('header_election').innerHTML = '';
 }
 
-// clear content
-function reset_content() {
-    document.getElementById('content_election').innerHTML = '';
-}
-
 // clear result
 function reset_result() {
     document.getElementById('result_election').innerHTML = '';
@@ -81,14 +59,12 @@ function reset() {
     // clear html dom
     reset_error();
     reset_header();
-    reset_content();
     reset_result();
     // clear states
     reset_overview();
-    reset_answer();
-    reset_statement();
     reset_party();
     reset_opinion();
+    coalition = null;
 }
 
 // escape html special characters: &,<,>,",'
@@ -144,38 +120,45 @@ function read_json_from_file(json_file, callback) {
     request.send();
 }
 
-// calculate and save result for each party
+// calculate and save result for each coalition
 function calculate_result() {
-    // add result property for saving results
-    for (var i = 0; i < party.length; i++) {
-        party[i].result = 0;
-    };
-
-    // reset statements
-    valid_statements = 0;
-    
-    for (var i = 0; i < statement.length; i++) {
-        var radio_group_name = 'radio_statement' + i;
-        var selector = 'input[name="' + radio_group_name + '"]:checked';
-        var checked_button = document.querySelector(selector);
-        // if the skip button is checked, ignore this statement
-        if ((checked_button.id).indexOf('skip') > -1) {
-            continue;
+    coalition = [];
+    // sort party array by id asc
+    party.sort(function(a, b) { 
+        return a.id - b.id;
+    });
+    // sort opinion by party asc,statement asc
+    opinion.sort(function(a, b) {
+        if (a.party != b.party) {
+            return a.party - b.party;
         };
-        // find user opinion from selected radio button
-        var user_opinion = parseInt(checked_button.value);
-        // count unskipped statements
-        valid_statements++;
-        
-        // add points for matching statement
-        for (var j = 0; j < party.length; j++) {
-            for (var k = 0; k < opinion.length; k++) {
-                if (opinion[k].party === party[j].id
-                        && opinion[k].statement === statement[i].id
-                        && opinion[k].answer === user_opinion) {
-                    party[j].result++;
+        return a.statement - b.statement;
+    });
+    for (var x = 0; x < party.length; x++) {
+        for (var y = 0; y < party.length; y++) {
+            // only calculate one way (x,y || y,x)
+            // and skip if party compared to itself
+            if (x >= y) {
+                continue;
+            };
+            var match = 0;
+            var obj = {};
+            obj.first = party[x];
+            obj.second = party[y];
+            for (var i = 0; i < statements; i++) {
+                // calculate opinion id by party id and statement id
+                opinionx = x * statements + i;
+                opiniony = y * statements + i;
+                // add points for matching statements
+                if (opinion[opinionx].party === x
+                        && opinion[opiniony].party === y
+                        && opinion[opinionx].statement === opinion[opiniony].statement
+                        && opinion[opinionx].answer === opinion[opiniony].answer) {
+                    match++;
                 };
             };
+            obj.match = match;
+            coalition.push(obj);
         };
     };
 }
@@ -186,7 +169,7 @@ function show_error(msg) {
         msg = 'Failed to load or parse needed data. See console for more info. Please try again!';
     };
     var final_msg = '<pre>ERROR: ' + msg + '</pre>';
-    document.getElementById('error_election').innerHTML = final_msg;
+    document.getElementById('error_election').innerHTML += final_msg;
 }
 
 // fill up the dropdown menu with available elections
@@ -223,73 +206,47 @@ function show_header() {
     };
     
     // enable election loading button only when answer and statement finished loading as well
-    if (answer_loaded
-            && statement_loaded) {
+    if (party_loaded
+            && opinion_loaded) {
         document.getElementById('button_load_election').disabled = false;
     };
 }
 
-// show main page as statement and possible answers
-function show_content() {
-    // not all files loaded correctly, so show error
-    if (statement === null
-            || answer === null) {
-        show_error(null);
-    } else {
-        var content = '';
-        for (var i = 0; i < statement.length; i++) {
-            var radio_group_name = 'radio_statement' + i;
-            var radio_id_skip = radio_group_name + 'skip';
-            var radio_id_skip_label = 'Überspringen';
-            // show statement
-            content += '<fieldset><legend><strong>' + (i + 1) + '.</strong> <em>' + escapeHtml(statement[i].text) + '</em></legend>';
-            // create skip radio button
-            content += '<input type="radio" name="' + radio_group_name + '" id="' + radio_id_skip + '" value="skip" checked><label for="' + radio_id_skip + '">' + radio_id_skip_label + '</label>';
-            for (var j = 0; j < answer.length; j++) {
-                var radio_id = radio_group_name + 'answer' + escapeHtml(answer[j].id);
-                // create radio button for each given answer
-                content += '<input type="radio" name="' + radio_group_name + '" id="' + radio_id + '" value="' + escapeHtml(answer[j].id) + '"><label for="' + radio_id + '">' + escapeHtml(answer[j].message) + '</label>';
-            };
-            content += '</fieldset>';
-        };
-        content += '<br><button id="button_load_result">Auswertung</button>';
-        document.getElementById('content_election').innerHTML = content;
-        // listener can only be added after setting innerHTML
-        document.getElementById('button_load_result').addEventListener('click', load_result);
-    };
-    
-    // enable election loading button only when overview finished loading as well
-    if (overview_loaded) {
-        document.getElementById('button_load_election').disabled = false;
-    };
-}
-
-// show parties and their results corresponding to the user answers
+// show coalitions and their results
 function show_result() {
     // not all files loaded correctly, so show error
     if (party === null
             || opinion === null) {
         show_error(null);
     } else {
+        // enable election loading button only when party and opinion finished loading as well
+        document.getElementById('button_load_election').disabled = false;
+        // do counting magic
+        statements = opinion.length/party.length;
         calculate_result();
         // sort parties by their result (top down)
-        party.sort(function(a, b) { 
-            return b.result - a.result;
+        coalition.sort(function(a, b) { 
+            return b.match - a.match;
         });
         
         // create numbered list and add all parties
         var result = '<ol type="1">';
-        for (var i = 0; i < party.length; i++) {
-            result += '<li><strong>' + escapeHtml(party[i].name) + '</strong>: ' + party[i].result + ' von ' + valid_statements + ' Punkten</li>';
+        for (var i = 0; i < coalition.length; i++) {
+            result += '<li><strong><em>' + escapeHtml(coalition[i].first.name) + ' + '
+                                 + escapeHtml(coalition[i].second.name) + '</em></strong>: '
+                                 + coalition[i].match + '/' + statements + ' Punkten</li>';
         };
         result += '</ol>';
         document.getElementById('result_election').innerHTML = result;
     };
     
+    // enable election loading button only when overview finished loading as well
+    if (overview_loaded) {
+        document.getElementById('button_load_election').disabled = false;
+    };
+    
     // go to the top where the result is displayed
     window.scrollTo(0, 0);
-    // show button again, for reloading result (after changing opinions)
-    document.getElementById('button_load_result').disabled = false;
 }
 
 function callback_load_list(object) {
@@ -302,28 +259,12 @@ function callback_load_overview(object) {
     overview_loaded = true;
 }
 
-function callback_load_answer(object) {
-    answer = object;
-    if (statement_loaded) {
-        show_content();
-    };
-    answer_loaded = true;
-}
-
 function callback_load_party(object) {
     party = object;
     if (opinion_loaded) {
         show_result();
     };
     party_loaded = true;
-}
-
-function callback_load_statement(object) {
-    statement = object;
-    if (answer_loaded) {
-        show_content();
-    };
-    statement_loaded = true;
 }
 
 function callback_load_opinion(object) {
@@ -355,36 +296,16 @@ function load_election() {
         read_json_from_file(data_url + '/' + selected + '/' + json_overview, callback_load_overview);
     };
     
-    // do not load json if already loaded
-    if (answer !== null && statement != null) {
-        show_content();
-    } else {
-        reset_error();
-        reset_content();
-        // if both are null, we have to set their $_loaded to false before calling each's read_json_from_file
-        if (answer === null && statement === null) {
-            answer_loaded = false;
-            statement_loaded = false;
-        };
-        if (answer === null) {
-            reset_answer();
-            read_json_from_file(data_url + '/' + selected + '/' + json_answer, callback_load_answer);
-        };
-        if (statement === null) {
-            reset_statement();
-            read_json_from_file(data_url + '/' + selected + '/' + json_statement, callback_load_statement);
-        };
-    };
+    load_result();
 }
 
 function load_result() {
-    document.getElementById('button_load_result').disabled = true;
-    
     // do not load json if already loaded
     if (party !== null && opinion !== null) {
         show_result();
     } else {
         reset_result();
+        coalition = null;
         // if both are null, we have to set their $_loaded to false before calling each's read_json_from_file
         if (party === null && opinion === null) {
             party_loaded = false;

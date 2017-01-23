@@ -10,6 +10,9 @@ var json_overview = 'overview.json';
 var json_party = 'party.json';
 var json_opinion = 'opinion.json';
 
+// static strings
+var allparties = 'Alle Parteien';
+
 // save the states of the selection
 var selected = '';
 var overview_loaded;
@@ -49,6 +52,11 @@ function reset_header() {
     document.getElementById('header_election').innerHTML = '';
 }
 
+// clear filter
+function reset_filter() {
+    document.getElementById('filter_party').innerHTML = '';
+}
+
 // clear result
 function reset_result() {
     document.getElementById('result_election').innerHTML = '';
@@ -59,6 +67,7 @@ function reset() {
     // clear html dom
     reset_error();
     reset_header();
+    reset_filter();
     reset_result();
     // clear states
     reset_overview();
@@ -212,6 +221,37 @@ function show_header() {
     };
 }
 
+// show filter (select box + button) based on party
+function show_filter() {
+    var error = '';
+    // party not loaded correctly, so show error
+    if (party === null) {
+        show_error(null);
+    } else if (party.length == 0) {
+        show_error('No available parties found.');
+    } else {
+        // get dropdown menu
+        // create a filter with all parties
+        var result = '<span>Filter:</span>';
+        result += '<select id="select_party" size="1" disabled></select>';
+        result += '<button id="button_filter_party" disabled>Los</button>';
+        document.getElementById('filter_party').innerHTML = result;
+        
+        // add "alle" and all parties to the select
+        var select_party = document.getElementById('select_party');
+        select_party.appendChild(new Option(allparties));
+        for (var i = 0; i < party.length; i++) {
+            // we do not need to use escapeHtml here, because option.text takes it literally
+            var party_name = party[i].name;
+            var new_option = new Option(party_name);
+            select_party.appendChild(new_option);
+        };
+        // enable dropdown menu and add listener to button
+        document.getElementById('select_party').disabled = false;
+        document.getElementById('button_filter_party').addEventListener('click', show_result);
+    };
+}
+
 // show coalitions and their results
 function show_result() {
     // not all files loaded correctly, so show error
@@ -229,15 +269,30 @@ function show_result() {
             return b.match - a.match;
         });
         
-        // create numbered list and add all parties
+        // read out set filter
+        filter = document.getElementById('select_party').value;
+        
+        // create numbered list and add all coalitions matching the filter
         var result = '<ol type="1">';
         for (var i = 0; i < coalition.length; i++) {
-            result += '<li><strong><em>' + escapeHtml(coalition[i].first.name) + ' + '
-                                 + escapeHtml(coalition[i].second.name) + '</em></strong>: '
-                                 + coalition[i].match + '/' + statements + ' Punkten</li>';
+            if ((filter === allparties)
+                    || (filter === coalition[i].first.name)) {
+                result += '<li><strong><em>' + escapeHtml(coalition[i].first.name) + ' + '
+                        + escapeHtml(coalition[i].second.name) + '</em></strong>: '
+                        + coalition[i].match + '/' + statements + ' Punkten</li>';
+            };
+            // change order based on filter
+            if (filter === coalition[i].second.name) {
+                result += '<li><strong><em>' + escapeHtml(coalition[i].second.name) + ' + '
+                        + escapeHtml(coalition[i].first.name) + '</em></strong>: '
+                        + coalition[i].match + '/' + statements + ' Punkten</li>';
+            };
         };
         result += '</ol>';
         document.getElementById('result_election').innerHTML = result;
+        
+        // enable filter button
+        document.getElementById('button_filter_party').disabled = false;
     };
     
     // enable election loading button only when overview finished loading as well
@@ -261,6 +316,7 @@ function callback_load_overview(object) {
 
 function callback_load_party(object) {
     party = object;
+    show_filter();
     if (opinion_loaded) {
         show_result();
     };

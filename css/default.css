@@ -1,14 +1,9 @@
-/* Copyright (c) 2016 Felix Bolte */
+/* Copyright (c) 2017 Felix Bolte */
 
 /* general */
 body {
   width: 720px;
   text-align: left;
-}
-
-/* make all checked radio button labels bold */
-input[type="radio"]:checked+label {
-  font-weight: bold;
 }
 
 /* show error message in red */
@@ -30,10 +25,6 @@ input[type="radio"]:checked+label {
   border: none;
 }
 
-#content_election {
-  font-size: small;
-}
-
 #code {
   font-weight: bold;
 }
@@ -41,4 +32,13 @@ input[type="radio"]:checked+label {
 #data {
   font-weight: bold;
   color: gray;
+}
+
+#plus {
+  color: darkgreen;
+}
+
+#points {
+  font-weight: bold;
+  color: darkred;
 }

@@ -1,4 +1,4 @@
-/* Copyright (c) 2016 Felix Bolte */
+/* Copyright (c) 2017 Felix Bolte */
 
 // define json data as available in qual-o-mat-data
 // see https://github.com/gockelhahn/qual-o-mat-data
@@ -132,10 +132,12 @@ function read_json_from_file(json_file, callback) {
 // calculate and save result for each coalition
 function calculate_result() {
     coalition = [];
+    
     // sort party array by id asc
     party.sort(function(a, b) { 
         return a.id - b.id;
     });
+    
     // sort opinion by party asc,statement asc
     opinion.sort(function(a, b) {
         if (a.party != b.party) {
@@ -143,21 +145,21 @@ function calculate_result() {
         };
         return a.statement - b.statement;
     });
+    
+    // for two party coalitions
     for (var x = 0; x < party.length; x++) {
-        for (var y = 0; y < party.length; y++) {
-            // only calculate one way (x,y || y,x)
-            // and skip if party compared to itself
-            if (x >= y) {
-                continue;
-            };
+        // only calculate one way (x,y || y,x)
+        // and skip if party compared to itself
+        for (var y = x + 1; y < party.length; y++) {
             var match = 0;
             var obj = {};
             obj.first = party[x];
             obj.second = party[y];
+            obj.third = null;
             for (var i = 0; i < statements; i++) {
                 // calculate opinion id by party id and statement id
-                opinionx = x * statements + i;
-                opiniony = y * statements + i;
+                var opinionx = x * statements + i;
+                var opiniony = y * statements + i;
                 // add points for matching statements
                 if (opinion[opinionx].party === x
                         && opinion[opiniony].party === y
@@ -168,6 +170,35 @@ function calculate_result() {
             };
             obj.match = match;
             coalition.push(obj);
+            
+            // for three party coalitions
+            // only calculate one way (y,z || z,y)
+            // and skip if party compared to itself
+            for (var z = y + 1; z < party.length; z++) {
+                match = 0;
+                var obj2 = {};
+                obj2.first = party[x];
+                obj2.second = party[y];
+                obj2.third = party[z];
+                for (var i = 0; i < statements; i++) {
+                    // calculate opinion id by party id and statement id
+                    var opinionx = x * statements + i;
+                    var opiniony = y * statements + i;
+                    var opinionz = z * statements + i;
+                    // add points for matching statements
+                    if (opinion[opinionx].party === x
+                            && opinion[opiniony].party === y
+                            && opinion[opinionz].party === z
+                            && opinion[opinionx].statement === opinion[opiniony].statement
+                            && opinion[opiniony].statement === opinion[opinionz].statement
+                            && opinion[opinionx].answer === opinion[opiniony].answer
+                            && opinion[opiniony].answer === opinion[opinionz].answer) {
+                        match++;
+                    };
+                };
+                obj2.match = match;
+                coalition.push(obj2);
+            };
         };
     };
 }
@@ -232,9 +263,16 @@ function show_filter() {
     } else {
         // get dropdown menu
         // create a filter with all parties
-        var result = '<span>Filter:</span>';
-        result += '<select id="select_party" size="1" disabled></select>';
-        result += '<button id="button_filter_party" disabled>Los</button>';
+        var result = '<span>Filter:</span>&nbsp;';
+        result += '<select id="select_party" size="1" disabled></select>&nbsp;';
+        result += '<button id="button_filter_party" disabled>Los</button><br>';
+        result += '<input name="coalition_size" id="radio_two" value="2" checked="" type="radio">' +
+                  '<label for="radio_two">2er Koalitionen</label>';
+        result += '<input name="coalition_size" id="radio_three" value="3" type="radio">' +
+                  '<label for="radio_three">3er Koalitionen</label>';
+        result += '<input name="coalition_size" id="radio_all" value="0" type="radio">' +
+                  '<label for="radio_all">2er- und 3er-Koalitionen</label>';
+
         document.getElementById('filter_party').innerHTML = result;
         
         // add "alle" and all parties to the select
@@ -252,8 +290,27 @@ function show_filter() {
     };
 }
 
+// helper result line
+function assemble_result_line(match, one, two, three) {
+    var value = '<li><strong><em>';
+    value += escapeHtml(one);
+    value += '<span id="plus"> + </span>';
+    value += escapeHtml(two);
+    // if "third" argument not existing
+    if (typeof three != 'undefined') {
+        value += '<span id="plus"> + </span>';
+        value += escapeHtml(three);
+    };
+    value += '</em></strong>: ';
+    value += '<span id="points">' + match + '</span>';
+    value += '/' + statements + ' Punkten</li>';
+    return value;
+}
+
 // show coalitions and their results
 function show_result() {
+    // disable filter button until finished
+    document.getElementById('button_filter_party').disabled = true;
     // not all files loaded correctly, so show error
     if (party === null
             || opinion === null) {
@@ -269,23 +326,55 @@ function show_result() {
             return b.match - a.match;
         });
         
-        // read out set filter
-        filter = document.getElementById('select_party').value;
+        // read out applied filter
+        var filter = document.getElementById('select_party').value;
+        
+        // read out coalition size to show (0 = all)
+        var selector = 'input[name="coalition_size"]:checked';
+        var coalition_size = document.querySelector(selector);
         
         // create numbered list and add all coalitions matching the filter
         var result = '<ol type="1">';
         for (var i = 0; i < coalition.length; i++) {
-            if ((filter === allparties)
-                    || (filter === coalition[i].first.name)) {
-                result += '<li><strong><em>' + escapeHtml(coalition[i].first.name) + ' + '
-                        + escapeHtml(coalition[i].second.name) + '</em></strong>: '
-                        + coalition[i].match + '/' + statements + ' Punkten</li>';
-            };
-            // change order based on filter
-            if (filter === coalition[i].second.name) {
-                result += '<li><strong><em>' + escapeHtml(coalition[i].second.name) + ' + '
-                        + escapeHtml(coalition[i].first.name) + '</em></strong>: '
-                        + coalition[i].match + '/' + statements + ' Punkten</li>';
+            if (coalition[i].third != null) {
+                // skip results of coalitions with 3 parties
+                // when radio box only wants to see 2 party coalitions
+                if (parseInt(coalition_size.value) === 2) {
+                    continue;
+                };
+                if ((filter === allparties)
+                        || (filter === coalition[i].first.name)) {
+                    result += assemble_result_line(coalition[i].match,
+                                                   coalition[i].first.name,
+                                                   coalition[i].second.name,
+                                                   coalition[i].third.name);
+                } else if (filter === coalition[i].second.name) {
+                    result += assemble_result_line(coalition[i].match,
+                                                   coalition[i].second.name,
+                                                   coalition[i].first.name,
+                                                   coalition[i].third.name);
+                } else if (filter === coalition[i].third.name) {
+                    result += assemble_result_line(coalition[i].match,
+                                                   coalition[i].third.name,
+                                                   coalition[i].first.name,
+                                                   coalition[i].second.name);
+                };
+            } else {
+                // skip results of coalitions with 2 parties
+                // when radio box only wants to see 3 party coalitions
+                if (parseInt(coalition_size.value) === 3) {
+                    continue;
+                };
+                if ((filter === allparties)
+                        || (filter === coalition[i].first.name)) {
+                    result += assemble_result_line(coalition[i].match,
+                                                   coalition[i].first.name,
+                                                   coalition[i].second.name);
+                } else if (filter === coalition[i].second.name) {
+                    result += assemble_result_line(coalition[i].match,
+                                                   coalition[i].second.name,
+                                                   coalition[i].first.name);
+                };
             };
         };
         result += '</ol>';

@@ -267,9 +267,9 @@ function show_filter() {
         result += '<select id="select_party" size="1" disabled></select>&nbsp;';
         result += '<button id="button_filter_party" disabled>Los</button><br>';
         result += '<input name="coalition_size" id="radio_two" value="2" checked="" type="radio">' +
-                  '<label for="radio_two">2er Koalitionen</label>';
+                  '<label for="radio_two">2er-Koalitionen</label>';
         result += '<input name="coalition_size" id="radio_three" value="3" type="radio">' +
-                  '<label for="radio_three">3er Koalitionen</label>';
+                  '<label for="radio_three">3er-Koalitionen</label>';
         result += '<input name="coalition_size" id="radio_all" value="0" type="radio">' +
                   '<label for="radio_all">2er- und 3er-Koalitionen</label>';
 
@@ -294,15 +294,15 @@ function show_filter() {
 function assemble_result_line(match, one, two, three) {
     var value = '<li><strong><em>';
     value += escapeHtml(one);
-    value += '<span id="plus"> + </span>';
+    value += '<span class="plus"> + </span>';
     value += escapeHtml(two);
     // if "third" argument not existing
     if (typeof three != 'undefined') {
-        value += '<span id="plus"> + </span>';
+        value += '<span class="plus"> + </span>';
         value += escapeHtml(three);
     };
     value += '</em></strong>: ';
-    value += '<span id="points">' + match + '</span>';
+    value += '<span class="points">' + match + '</span>';
     value += '/' + statements + ' Punkten</li>';
     return value;
 }

@@ -4,7 +4,7 @@ Der folgende POC zeigt übereinstimmende Meinungen zwischen zwei bis drei Partei
 
 ## Preview
 
-Man kann sich [hier](https://rawgit.com/gockelhahn/koal-o-mat-kiss/master/index.html) immer die aktuelle Version anzeigen lassen.
+Man kann sich [hier](https://gockelhahn.github.io/koal-o-mat-kiss/) immer die aktuelle Version anzeigen lassen.
 
 ## Setup
 
